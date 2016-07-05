@@ -1,0 +1,276 @@
+<html>
+<head>
+	<title>oop</title>
+<style type="text/css">
+.question {
+	color: red;
+}
+
+li {
+	color: green;
+}
+
+#start {
+	background-color: red;
+}
+
+#next {
+	background-color: blue;
+}
+</style>
+</head>
+<body>
+	<!--<button id="a">a</button>
+	<button id="b">b</button>-->
+	<div id="correct"></div>
+	<div id="demo"></div>
+	<button onclick="nextQuestion()">begin</button>
+	<button id="back">Back</button>
+	<button id="reset" style="display: none">reset</button>
+	<p id="a">click begin to start quiz.</p>
+<script type="text/javascript">
+/*var inc=0
+
+document.getElementById("a").addEventListener("click", function() {
+	inc++;
+	document.getElementById("demo").innerHTML= inc;
+});
+
+
+document.getElementById("b").addEventListener("click", function() {
+	inc--;
+	document.getElementById("demo").innerHTML= inc;
+})
+*/
+
+
+var idx=0;
+var correct=0;
+var missed=0
+var count= [];
+//object literal
+
+
+function User(theName, theEmail) {
+	this.name= theName;
+	this.email= theEmail;
+	this.quizScores= [];
+	this.currentScore= 0;
+}
+
+User.prototype= {
+	constructor: User,
+	saveScore: function(theScoreToAdd) {
+		this.quizScores.push(theScoreToAdd)
+	},
+	showNameandScores: function() {
+		var scores= this.quizScores.length> 0? this.quizScores.join(","): "no scores yet";
+		return this.name+ " scores: "+scores;
+	},
+	changeEmail: function(newEmail) {
+		this.email= newEmail;
+		return "new email saved:" + this.email;
+	}
+}
+firstUser= new User("Michael Dominic La Hay", "lahaymd@gmail.com");
+console.log(firstUser.email);
+var test= firstUser.changeEmail("lahaymd@yahoo.com");
+console.log(firstUser.email);
+console.log(test);
+firstUser.saveScore(15);
+firstUser.saveScore(10);
+console.log(firstUser.showNameandScores());
+
+
+function inheritPrototype(childObject, parentObject) {
+	var copyOfParent= Object.create(parentObject.prototype);
+	copyOfParent.constuctor= childObject;
+	childObject.prototype= copyOfParent;
+}
+
+function Question(theQuestion, theChoices, theCorrectAnswer) {
+	this.question= theQuestion;
+	this.choices= theChoices;
+	this.correctAnswer= theCorrectAnswer;
+	this.userAnswer= "";
+	var newDate= new Date(),
+	QUIZ_CREATED_DATE= newDate.toLocaleDateString();
+	this.getQuizDate= function() {
+		return QUIZ_CREATED_DATE;
+	};
+	console.log("Quiz Created On:" +this.getQuizDate());
+}
+
+Question.prototype.getCorrectAnswer= function() {
+	return this.correctAnswer;
+};
+Question.prototype.getUserAnswer= function() {
+	return this.userAnswer;
+};
+Question.prototype.displayQuestion= function() {
+	var questionToDisplay= "<div class='question'>" + this.question + "</div><ul>";
+	choiceCounter= 0;
+	this.choices.forEach(function(eachChoice){
+		questionToDisplay+= "<li><input type='radio' name='choice' value='" + choiceCounter + "'>" + eachChoice + "</li>";
+		choiceCounter++
+	});
+	questionToDisplay+= "</ul>";
+	var el=document.createElement("div");
+	var node= questionToDisplay;
+	el.innerHTML= node;
+	var a= document.getElementById("a");
+	a.appendChild(el);
+	
+
+
+};
+
+
+
+function MultipleChoiceQuestion(theQuestion, theChoices, theCorrectAnswer){
+	Question.call(this, theQuestion, theChoices, theCorrectAnswer);
+};
+
+inheritPrototype(MultipleChoiceQuestion, Question);
+
+function DragDropQuestion(theQuestion, theChoices, theCorrectAnswer) {
+	Question.call(this,theQuestion, theChoices, theCorrectAnswer);
+}
+
+inheritPrototype(DragDropQuestion, Question);
+
+DragDropQuestion.prototype.displayQuestion= function() {
+	var questionToDisplay= "<div class='question'>" + this.question + "</div><ul>";
+	choiceCounter= 0;
+	this.choices.forEach(function(eachChoice){
+		questionToDisplay+= "<li><input type='checkbox' name='choice' value='" + choiceCounter + "'>" + eachChoice + "</li>";
+		choiceCounter++
+	});
+	questionToDisplay+= "</ul>";
+	
+
+
+	var el=document.createElement("div");
+	var node= questionToDisplay;
+	el.innerHTML= node;
+	var a= document.getElementById("a");
+	a.appendChild(el);
+};
+
+
+
+var allQuestions=[
+new MultipleChoiceQuestion("Who is prime minister of England?", ["Obama", "Blair", "Brown", "Cameron", "Trump"], 3),
+new MultipleChoiceQuestion("What is the Capital of Brazil?", ["Sao Paulo", "Rio de Janeiro", "Brasila"], 2),
+new DragDropQuestion("Drag the correct City to the world map", ["Washington", "Rio", "Stockholm"], 0)
+];
+
+ 
+
+	
+ window.addEventListener("load", function() {
+  allQuestions[0].displayQuestion();
+});
+
+ function getQuestion() {
+	document.getElementById("a").innerHTML= null;
+	 allQuestions[idx].displayQuestion();
+	
+}
+
+
+function correctAnswer() {
+	var checkedValue= null;
+	var emptycount=0;
+	var found= false;
+	var inputElements= document.getElementsByName("choice");
+	for(var i=0; inputElements[i]; i++) {
+		checkedValue=inputElements[i].value;
+		if(inputElements[i].checked) {
+			found =true;
+			count.push(checkedValue);
+		
+			alert(count);
+			alert(checkedValue);
+			alert(allQuestions[idx].getCorrectAnswer())
+				if(checkedValue==allQuestions[idx].getCorrectAnswer()){
+			//alert(allQuestions[idx].getCorrectAnswer());
+			//if(allQuestions[idx].getCorrectAnswer== answer) 
+				correct++;
+				}else{missed++;}
+			
+			} //ischecked closing paren
+		if(!found){
+			emptycount++;
+		}
+		} //for loop closing paren
+			if(emptycount==inputElements.length) {
+				alert(emptycount);
+				alert("please answer");
+				idx--;
+				//preventDefault();
+			
+			}
+
+		} //function closing paren
+	
+function updatePercentCorrect() {
+	document.getElementById("correct").innerHTML= "you got " +correct + " correct out of " +(idx) +" answers and missed "+ missed +" this many";
+}
+
+ function nextQuestion() {
+ 	alert(document.getElementsByName("choice").value)
+ 	//if(document.getElementsByName("choice")[0].checked>0){
+ 		correctAnswer();
+ 
+ 		if (idx< allQuestions.length-1  ) {
+		
+ 		idx++;
+ 		
+ 		getQuestion();
+
+ 		
+		updatePercentCorrect();
+		} else {
+		correctAnswer();
+		idx++;
+		updatePercentCorrect();
+		document.getElementById('a').innerHTML= null;
+		document.getElementById('a').innerHTML= "all done!"
+		document.getElementById('start').innerHTML= "restart";
+		restartQuiz();
+			}
+	//}else{alert("please answer the question")}
+} 
+	
+ 
+
+
+ function restartQuiz() {
+ 	if(document.getElementById('start').innerHTML= "restart"){
+ 		document.getElementById('reset').style.display= "block";
+		document.getElementById('reset').onclick= function() {
+			location.reload(true);
+		}
+	}
+ };
+
+	document.getElementById("back").addEventListener("click",function() {
+	idx--;
+	
+	getQuestion();
+	//alert(count);
+	var q= document.getElementsByName("choice")[count[count.length-1]].checked=true;
+	var t= document.getElementsByName("choice")[count[count.length-1]].value
+	alert(t);
+	alert(allQuestions[idx].getCorrectAnswer());
+	if(t==allQuestions[idx].getCorrectAnswer()){
+		correct--}else{missed--}
+	count.pop();
+	//alert(count);
+	updatePercentCorrect();
+	});
+
+	</script>
+</body>
+</html>
