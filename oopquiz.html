@@ -9,47 +9,20 @@
 li {
 	color: green;
 }
-
-#start {
-	background-color: red;
-}
-
-#next {
-	background-color: blue;
-}
 </style>
 </head>
 <body>
-	<!--<button id="a">a</button>
-	<button id="b">b</button>-->
 	<div id="correct"></div>
-	<div id="demo"></div>
-	<button onclick="nextQuestion()">begin</button>
+	<button onclick="nextQuestion()">Next Question</button>
 	<button id="back">Back</button>
 	<button id="reset" style="display: none">reset</button>
 	<p id="a">click begin to start quiz.</p>
+	<div id="append-question"></div>
 <script type="text/javascript">
-/*var inc=0
-
-document.getElementById("a").addEventListener("click", function() {
-	inc++;
-	document.getElementById("demo").innerHTML= inc;
-});
-
-
-document.getElementById("b").addEventListener("click", function() {
-	inc--;
-	document.getElementById("demo").innerHTML= inc;
-})
-*/
-
-
 var idx=0;
 var correct=0;
 var missed=0
 var count= [];
-//object literal
-
 
 function User(theName, theEmail) {
 	this.name= theName;
@@ -162,7 +135,7 @@ DragDropQuestion.prototype.displayQuestion= function() {
 var allQuestions=[
 new MultipleChoiceQuestion("Who is prime minister of England?", ["Obama", "Blair", "Brown", "Cameron", "Trump"], 3),
 new MultipleChoiceQuestion("What is the Capital of Brazil?", ["Sao Paulo", "Rio de Janeiro", "Brasila"], 2),
-new DragDropQuestion("Drag the correct City to the world map", ["Washington", "Rio", "Stockholm"], 0)
+new DragDropQuestion("select the non US cities", [" Berlin", "Washington", "Rio"], [0,2] )
 ];
 
  
@@ -172,7 +145,7 @@ new DragDropQuestion("Drag the correct City to the world map", ["Washington", "R
   allQuestions[0].displayQuestion();
 });
 
- function getQuestion() {
+function getQuestion() {
 	document.getElementById("a").innerHTML= null;
 	 allQuestions[idx].displayQuestion();
 	
@@ -181,91 +154,105 @@ new DragDropQuestion("Drag the correct City to the world map", ["Washington", "R
 
 function correctAnswer() {
 	var checkedValue= null;
+	checkedArray=[];
 	var emptycount=0;
 	var found= false;
 	var inputElements= document.getElementsByName("choice");
 	for(var i=0; inputElements[i]; i++) {
 		checkedValue=inputElements[i].value;
-		if(inputElements[i].checked) {
-			found =true;
-			count.push(checkedValue);
-		
-			alert(count);
-			alert(checkedValue);
-			alert(allQuestions[idx].getCorrectAnswer())
-				if(checkedValue==allQuestions[idx].getCorrectAnswer()){
-			//alert(allQuestions[idx].getCorrectAnswer());
-			//if(allQuestions[idx].getCorrectAnswer== answer) 
-				correct++;
-				}else{missed++;}
+			if(inputElements[i].checked) {
+				checkedArray.push(checkedValue);
+				found =true;
+				
+					
+
 			
 			} //ischecked closing paren
 		if(!found){
 			emptycount++;
 		}
-		} //for loop closing paren
+	} //for loop closing paren
+	count.push(checkedArray);
+	
+	if(checkedArray.toString()==allQuestions[idx].getCorrectAnswer().toString()){
+						correct++;
+				}else{
+						missed++;
+					 }
+	
+	
+	
+	
 			if(emptycount==inputElements.length) {
-				alert(emptycount);
+			
 				alert("please answer");
 				idx--;
-				//preventDefault();
-			
 			}
-
-		} //function closing paren
+		} 
 	
 function updatePercentCorrect() {
 	document.getElementById("correct").innerHTML= "you got " +correct + " correct out of " +(idx) +" answers and missed "+ missed +" this many";
 }
 
- function nextQuestion() {
- 	alert(document.getElementsByName("choice").value)
- 	//if(document.getElementsByName("choice")[0].checked>0){
+function nextQuestion() {
+ 	
  		correctAnswer();
  
  		if (idx< allQuestions.length-1  ) {
-		
  		idx++;
- 		
  		getQuestion();
-
+ 		updatePercentCorrect();
  		
-		updatePercentCorrect();
+ 		console.log(count);
+
 		} else {
-		correctAnswer();
-		idx++;
+		 idx++;
 		updatePercentCorrect();
 		document.getElementById('a').innerHTML= null;
 		document.getElementById('a').innerHTML= "all done!"
-		document.getElementById('start').innerHTML= "restart";
-		restartQuiz();
+		document.getElementById('reset').style.display= "block";
+		document.getElementById('reset').innerHTML= "restart";
+		console.log(count);
 			}
-	//}else{alert("please answer the question")}
 } 
 	
  
+document.getElementById('reset').addEventListener('click', function() {
+	location.reload(true)
+})
 
-
- function restartQuiz() {
- 	if(document.getElementById('start').innerHTML= "restart"){
- 		document.getElementById('reset').style.display= "block";
-		document.getElementById('reset').onclick= function() {
-			location.reload(true);
-		}
-	}
- };
+ 
 
 	document.getElementById("back").addEventListener("click",function() {
+		var arrayValue= [];
+		alert('idx' +idx)
 	idx--;
-	
+	alert('idx' + idx)
 	getQuestion();
-	//alert(count);
-	var q= document.getElementsByName("choice")[count[count.length-1]].checked=true;
-	var t= document.getElementsByName("choice")[count[count.length-1]].value
-	alert(t);
+	alert('count: '+ count)
+	alert('length'+ count[idx].length)
+	alert(document.getElementsByName('choice').length)
+	for(i=0; i<=count[idx].length-1; i++){
+alert('count[idx][i]'+count[idx][i])
+		
+		 document.getElementsByName('choice')[count[idx][i]].checked=true;
+		
+	}
+	
+	for(i=0; i<=count[idx].length-1; i++) {
+		
+		var t= document.getElementsByName('choice')[count[idx][i]].value;
+		arrayValue.push(t);
+		alert(arrayValue)
+	}
+	// var t= document.getElementsByName("choice")[count[count.length-1]].value
+	// alert(t);
 	alert(allQuestions[idx].getCorrectAnswer());
-	if(t==allQuestions[idx].getCorrectAnswer()){
-		correct--}else{missed--}
+	if(arrayValue==allQuestions[idx].getCorrectAnswer()){
+		correct--;
+	}else{
+		missed--;
+	}
 	count.pop();
 	//alert(count);
 	updatePercentCorrect();
